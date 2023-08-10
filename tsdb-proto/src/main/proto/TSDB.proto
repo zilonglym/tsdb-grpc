@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+//import ""
+//package ""
+import "google/protobuf/any.proto";
+package com.zhaoyuan.proto.auto;
+
+option java_multiple_files = true;
+//option java_package = "proto.auto";
+option java_outer_classname = "TSDBProto";
+
+enum ACTION{
+  CREATE = 0;
+  READ = 1;
+  WRITE = 2;
+  DELETE = 3;
+}
+
+message BlobDL{
+  string date = 1;
+  double value = 2;
+}
+message BlobDLL{
+  string date = 1;
+  double value1 = 2;
+  double value2 = 3;
+}
+
+message TSDBRequest {
+  string tsid = 1;
+  string action = 2;
+  int32 tstype = 3;
+  string clz = 4;
+  //bytes body = 5;
+  repeated google.protobuf.Any data = 6;
+}
+
+message TSDBResponse{
+  string tsid = 1;
+  string action = 2;
+  int32 tstype = 3;
+  string clz = 4;
+  int32 result = 5;
+  repeated google.protobuf.Any data = 6;
+}
+
+service TSDBService{
+  rpc write(stream TSDBRequest) returns(TSDBResponse){}
+  //可以定义多个服务类，一个雷利可以有多个方法
+  // gRPC有4种流式
+  rpc read(stream TSDBRequest) returns(TSDBResponse){}
+}
+
