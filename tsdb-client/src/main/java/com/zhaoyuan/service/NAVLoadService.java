@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,12 +19,10 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-public class NAVLoadService implements ApplicationRunner {
+public class NAVLoadService implements ApplicationRunner{
     @GrpcClient("grpc-server")
     private TSDBServiceGrpc.TSDBServiceStub stub;
 
-
-    @Override
     public void run(ApplicationArguments args) throws Exception {
         BlobDLL.Builder blobDLL = BlobDLL.newBuilder();
         blobDLL.setDate("2023-08-06");
@@ -44,9 +43,11 @@ public class NAVLoadService implements ApplicationRunner {
 
             @Override
             public void onCompleted() {
+                log.info("onCompleted ");
 
             }
         });
+
 
         for (int i = 0; i < 10; i++) {
             TSDBRequest.Builder builder = TSDBRequest.newBuilder();
@@ -58,10 +59,11 @@ public class NAVLoadService implements ApplicationRunner {
             builder.addAllData(data);
             TSDBRequest tsdbRequest = builder.build();
             streamObserver.onNext(tsdbRequest);
-
-            System.out.println("sent message #" + i);
+//            streamObserver.onCompleted();
+            System.out.println("sent message #");
+            Thread.sleep(100);
         }
         streamObserver.onCompleted();
-
+//        return "";
     }
 }

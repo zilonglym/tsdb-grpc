@@ -1,4 +1,4 @@
-package com.zhaoyuan;
+package com.zhaoyuan.service;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -6,10 +6,12 @@ import com.zhaoyuan.proto.auto.*;
 import io.grpc.stub.StreamObserver;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.security.access.annotation.Secured;
 
-@GrpcService
+@GrpcService()
 @Slf4j
 public class TSDBService extends TSDBServiceGrpc.TSDBServiceImplBase{
+    @Secured("ROLE_GREET")
     @Override
     public StreamObserver<TSDBRequest> write(StreamObserver<TSDBResponse> responseObserver) {
         return new StreamObserver<TSDBRequest>() {
@@ -36,6 +38,7 @@ public class TSDBService extends TSDBServiceGrpc.TSDBServiceImplBase{
      * @param responseObserver
      * @return
      */
+    @Secured("ROLE_GREET")
     @Override
     public StreamObserver<TSDBRequest> read(StreamObserver<TSDBResponse> responseObserver) {
         return new StreamObserver<TSDBRequest>() {
@@ -61,6 +64,7 @@ public class TSDBService extends TSDBServiceGrpc.TSDBServiceImplBase{
             @Override
             public void onCompleted() {
                 log.info("TSDB Server Read Completed");
+                responseObserver.onNext(TSDBResponse.newBuilder().setAction("Success").build());
             }
         };
     }
