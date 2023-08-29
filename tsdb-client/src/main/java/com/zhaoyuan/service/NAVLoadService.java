@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -30,7 +31,9 @@ public class NAVLoadService implements ApplicationRunner{
         blobDLL.setValue2(2.2d);
         BlobDLL dll = blobDLL.build();
         ArrayList<Any> data = Lists.newArrayList(Any.pack(dll), Any.pack(dll));
-        StreamObserver<TSDBRequest> streamObserver = stub.read(new StreamObserver<TSDBResponse>() {
+        StreamObserver<TSDBRequest> streamObserver = stub
+                .withDeadlineAfter(10, TimeUnit.SECONDS)  // maybe fail with DEADLINE_EXCEEDED
+                .read(new StreamObserver<TSDBResponse>() {
             @Override
             public void onNext(TSDBResponse tsdbResponse) {
                 log.info("receive " + tsdbResponse);
@@ -61,7 +64,7 @@ public class NAVLoadService implements ApplicationRunner{
             streamObserver.onNext(tsdbRequest);
 //            streamObserver.onCompleted();
             System.out.println("sent message #");
-            Thread.sleep(100);
+            Thread.sleep(1000);
         }
         streamObserver.onCompleted();
 //        return "";
